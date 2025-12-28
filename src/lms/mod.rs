@@ -165,6 +165,27 @@ impl LmsClient {
         .await
     }
 
+    pub async fn get_volume(&self, name: String) -> Result<u64> {
+        self.handle_error(
+            (|| async {
+                let (request, field) = LmsRequest::get_volume(name);
+                let lms_response = self.post(&request).await?;
+                as_u64(lms_response, &field)
+            })()
+            .await,
+            anyhow!("Error get_volume"),
+        )
+        .await
+    }
+    
+    pub async fn set_volume(&self, name: String, volume: u8) -> Result<()> {
+        self.handle_error(
+            self.post_no_result(&LmsRequest::set_volume(name, volume)).await,
+            anyhow!("Error set_volume"),
+        )
+        .await
+    }
+
     // When the playlist is empty, the `field` is not here. The `result` field contains an empty
     // object.
     pub async fn get_artist(&self, name: String) -> Result<Option<String>> {

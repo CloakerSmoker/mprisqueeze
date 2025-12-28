@@ -235,7 +235,21 @@ impl MprisPlayer {
     #[zbus(property)]
     async fn volume(&self) -> f64 {
         debug!("MprisPlayer::volume");
-        1.0
+        let volume = self
+            .client
+            .get_volume(self.player_id.clone())
+            .await
+            .unwrap_or(100);
+        volume as f64 / 100.0
+    }
+    #[zbus(property)]
+    async fn set_volume(&self, volume: f64) {
+        debug!("MprisPlayer::set volume {}", volume);
+        let volume_u8 = ((if volume.is_finite() { volume.clamp(0.0, 1.0) } else { 0.0 }) * 100.0).round() as u8;
+        let _ = self.client
+            .set_volume(self.player_id.clone(), volume_u8)
+            .await;
+        ();
     }
     #[zbus(property)]
     async fn position(&self) -> i64 {

@@ -69,6 +69,16 @@ impl LmsRequest {
         Self::new(id).question("mode".to_string())
     }
 
+    pub fn get_volume(id: String) -> (Self, String) {
+        Self::new(id).add_param("mixer".to_string()).question("volume".to_string())
+    }
+    pub fn set_volume(id: String, volume: u8) -> Self {
+        Self::new(id)
+            .add_param("mixer".to_string())
+            .add_param("volume".to_string())
+            .add_param(volume.to_string())
+    }
+
     fn playlist(id: String) -> Self {
         Self::new(id).add_param("playlist".to_string())
     }
